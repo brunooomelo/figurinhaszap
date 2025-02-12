@@ -1,4 +1,5 @@
-import { environment } from "@/utils/environment";
+'use client'
+import { environment } from "../utils/environment";
 import { setCookie, parseCookies, destroyCookie } from "nookies";
 import {
   ReactNode,

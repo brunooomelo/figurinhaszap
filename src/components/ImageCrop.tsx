@@ -1,4 +1,4 @@
-import { TypeCrop } from "@/hooks/useCrop";
+import { TypeCrop } from "../hooks/useCrop";
 import Cropper from "react-easy-crop";
 
 type ImageCropProps = {

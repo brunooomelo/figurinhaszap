@@ -1,4 +1,4 @@
-import { GA_TRACKING_ID } from "@/utils/gtag";
+import { GA_TRACKING_ID } from "../utils/gtag";
 import Script from "next/script";
 
 export const Analytics = () => (

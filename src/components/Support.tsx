@@ -2,7 +2,7 @@ import { HelpCircle } from "lucide-react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { event } from "@/utils/gtag";
+import { event } from "../utils/gtag";
 
 export const Support = () => {
   const [open, setOpen] = useState(false);
