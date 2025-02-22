@@ -1,3 +1,5 @@
 export const environment = {
-  APIURL: process.env.NEXT_PUBLIC_APIURL || 'http://localhost:3333'
-}
+  APIURL: process.env.NEXT_PUBLIC_APIURL || "http://localhost:3333",
+  SITEURL:
+    process.env.NEXT_PUBLIC_SITEURL || "https://figurinhaszap.vercel.app",
+};

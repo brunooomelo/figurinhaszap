@@ -1,5 +1,4 @@
 import * as Dialog from "@radix-ui/react-dialog";
-
 import { Controller, useForm } from "react-hook-form";
 import { useAuth } from "./AuthContext";
 
@@ -23,11 +22,11 @@ export const PinForm = () => {
     setPin(data.token);
   };
 
-  if (user?.isAuthenticated) return null;
+  if (isLogged) return null;
 
   return (
     <Dialog.Root
-      open={isOpen}
+      open={isOpen && !isLogged && !!user}
       onOpenChange={(state) => {
         if (!isSubmitting) {
           openLogin({ status: state });
@@ -52,47 +51,23 @@ export const PinForm = () => {
             </Dialog.Description>
             <Controller
               control={control}
-              name="whatsapp"
+              name="token"
               render={(props) => (
                 <fieldset className="mb-[15px] flex items-center gap-5">
                   <label
                     className="text-violet11 w-[90px] text-right text-[15px]"
-                    htmlFor={props.field.name}
+                    htmlFor="pin"
                   >
-                    Whatsapp
+                    PIN
                   </label>
                   <input
+                    className="text-violet11 shadow-violet7 focus:shadow-violet8 inline-flex h-[35px] w-full flex-1 items-center justify-center rounded-[4px] px-[10px] text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
+                    id="pin"
                     {...props.field}
-                    data-loading={isSubmitting}
-                    id={props.field.name}
-                    className="text-violet11 shadow-violet7 focus:shadow-violet8 inline-flex h-[35px] w-full flex-1 items-center justify-center rounded-[4px] px-[10px] text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px] disabled:opacity-80 disabled:cursor-not-allowed "
-                    disabled
                   />
                 </fieldset>
               )}
             />
-
-            {!user?.isAuthenticated && isLogged && (
-              <Controller
-                control={control}
-                name="token"
-                render={(props) => (
-                  <fieldset className="mb-[15px] flex items-center gap-5">
-                    <label
-                      className="text-violet11 w-[90px] text-right text-[15px]"
-                      htmlFor="pin"
-                    >
-                      PIN
-                    </label>
-                    <input
-                      className="text-violet11 shadow-violet7 focus:shadow-violet8 inline-flex h-[35px] w-full flex-1 items-center justify-center rounded-[4px] px-[10px] text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
-                      id="pin"
-                      {...props.field}
-                    />
-                  </fieldset>
-                )}
-              />
-            )}
             <span className="text-xs text-zinc-400 leading-none">
               Após a verificação será gerado um token para que você não precise
               autenticar novamente.
@@ -128,14 +103,6 @@ export const PinForm = () => {
                 </button>
               </div>
             </div>
-            <Dialog.Close asChild>
-              <button
-                className="text-violet11 hover:bg-violet4 focus:shadow-violet7 absolute top-[10px] right-[10px] inline-flex h-[25px] w-[25px] appearance-none items-center justify-center rounded-full focus:shadow-[0_0_0_2px] focus:outline-none"
-                aria-label="Fechar a tela de autenticação"
-              >
-                {/* <Cross2Icon /> */}
-              </button>
-            </Dialog.Close>
           </form>
         </Dialog.Content>
       </Dialog.Portal>

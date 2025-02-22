@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Host
-Host: https://www.figurinhaszap.com
+Host: https://www.figurinhaszap.vercel.app
 
 # Sitemaps
-Sitemap: https://www.figurinhaszap.com/sitemap.xml
+Sitemap: https://www.figurinhaszap.vercel.app/sitemap.xml

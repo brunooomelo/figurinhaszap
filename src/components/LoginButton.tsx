@@ -18,7 +18,9 @@ export const LoginButton = () => {
             }
           }}
         >
-          {isLogged && user?.whatsapp ? hiddenPhone(user?.whatsapp) : "Entrar"}
+          {isLogged && user?.whatsapp ?
+            hiddenPhone(user)
+            : "Entrar"}
         </button>
       </DropdownMenu.Trigger>
 
@@ -46,5 +48,6 @@ export const LoginButton = () => {
         </DropdownMenu.Portal>
       )}
     </DropdownMenu.Root>
+
   );
 };

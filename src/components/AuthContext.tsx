@@ -1,6 +1,6 @@
 'use client'
 import { environment } from "../utils/environment";
-import { setCookie, parseCookies, destroyCookie } from "nookies";
+import { parseCookies, destroyCookie } from "nookies";
 import {
   ReactNode,
   createContext,
@@ -9,11 +9,13 @@ import {
   useEffect,
   useState,
 } from "react";
+import { PinForm } from "./PinForm";
+import { LoginForm } from "./LoginForm";
 
-type User = {
+export type User = {
   id: string;
   whatsapp: string;
-  isAuthenticated: boolean;
+  isPremium: boolean
 };
 type IOpenLogin = {
   status?: boolean;
@@ -40,25 +42,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const getSession = useCallback(async () => {
     const cookies = parseCookies();
-    const token = cookies.phone_token;
+    const token = cookies.auth;
 
     if (!token) return;
     const session = await fetch(`${environment.APIURL}/session`, {
       headers: {
         "x-auth-token": token,
       },
+      credentials: 'include'
     }).then((res) => res.json());
 
     if (session.error) {
+      //TODO: adicionar toast error
       alert(session.error);
       return;
     }
-    setUser(session.data);
+    setUser({
+      id: session.id,
+      whatsapp: session.whatsapp,
+      isPremium: (session.plan === "premium")
+    });
     setIsLogged(true);
   }, []);
 
   const logout = useCallback(async () => {
-    destroyCookie(null, 'phone_token')
+    destroyCookie(null, 'auth')
     setIsLogged(false);
     setUser(null);
   }, []);
@@ -76,7 +84,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async ({ whatsapp }: { whatsapp: string }) => {
     try {
-      const response = await fetch(`${environment.APIURL}/login`, {
+      const response = await fetch(`${environment.APIURL}/sign-in`, {
         method: "POST",
         body: JSON.stringify({
           whatsapp,
@@ -87,17 +95,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }).then((res) => res.json());
 
       if (response.error) {
-        // adicionar toast error
+        //TODO: adicionar toast error
         alert(response.error);
         return;
       }
 
       setUser({
         id: response.id,
-        isAuthenticated: response.isAuthenticated,
-        whatsapp: response.whatsapp,
+        whatsapp,
+        isPremium: false
       });
-      setIsLogged(true);
     } catch (error) {
       console.log(error);
       alert("Ocorreu um erro, tente mais tarde");
@@ -107,10 +114,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const setPin = async (token: string) => {
     try {
       if (!user?.id || !token) {
-        // TODO: error
+        // TODO: error toast
         return;
       }
-      const response = await fetch(`${environment.APIURL}/phone/validade`, {
+      const response = await fetch(`${environment.APIURL}/authenticate`, {
+        credentials: "include",
         method: "POST",
         body: JSON.stringify({
           id: user.id,
@@ -126,13 +134,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       alert(response.message);
-      const { id, isAuthenticated, whatsapp } = response.data;
-      setUser({ id, isAuthenticated, whatsapp });
-
-      setCookie(null, "phone_token", response.token, {
-        maxAge: 86400 * 7,
-        path: "/",
-      });
+      setIsLogged(true)
     } catch (error) {
       console.log(error);
       alert("Ocorreu um erro, tente mais tarde");
@@ -162,6 +164,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }}
     >
       {children}
+      <LoginForm />
+      <PinForm />
     </Context.Provider>
   );
 };

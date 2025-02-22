@@ -1,49 +1,45 @@
+'use client'
 import * as Dialog from "@radix-ui/react-dialog";
 
 import { Controller, useForm } from "react-hook-form";
 import { useAuth } from "./AuthContext";
-import { DDI } from "@/utils/DDI";
 import { useEffect } from "react";
-import InputMask from "react-input-mask";
 import {
   parsePhoneNumberFromString,
   isValidNumber,
 } from "libphonenumber-js";
 import { event } from "@/utils/gtag";
+import { X } from "lucide-react";
+import { PhoneInput } from "./ui/phoneNumber";
+import { useMutation } from '@tanstack/react-query'
+import { environment } from "@/utils/environment";
 
-const validatePhoneNumber = (country: string) => (value: string) => {
-  const phoneWithDDI = `${country}${value.trim().replace(/[^\d_]/g, "")}`;
-  const phoneNumber = parsePhoneNumberFromString(phoneWithDDI);
+const validatePhoneNumber = (value: string) => {
+  const phoneNumber = parsePhoneNumberFromString(value);
   if (!phoneNumber) return false;
-  return isValidNumber(phoneWithDDI);
+  return isValidNumber(value);
 };
 
 export const LoginForm = () => {
-  const { isLogged, openLogin, user, login, isOpen } = useAuth();
+  const { openLogin, login, isOpen, isLogged, user } = useAuth();
 
   const {
     control,
     handleSubmit,
     formState: { isSubmitting, isValid },
-    watch,
     reset,
-    setValue,
   } = useForm({
     defaultValues: {
       whatsapp: "",
       country: "+55",
     },
   });
-  const country = watch("country");
 
   const onSubmit = async (data: { whatsapp: string; country: string }) => {
     try {
-      const whatsapp = [
-        data.country,
-        data.whatsapp.trim().replace(/[^\d_]/g, ""),
-      ].join("");
-
-      login({ whatsapp });
+      const whatsapp = data.whatsapp.trim().replace(/[^\d_]/g, "")
+      if (!whatsapp) return
+      await login({ whatsapp })
     } catch (error) {
       console.log(error);
     }
@@ -55,18 +51,12 @@ export const LoginForm = () => {
     }
   }, [isOpen, reset]);
 
-  useEffect(() => {
-    setValue("whatsapp", "");
-  }, [country, setValue]);
-
   return (
     <Dialog.Root
-      open={isOpen}
-      onOpenChange={(state) => {
-        if (!isSubmitting) {
-          openLogin({ status: state });
-        }
-      }}
+      open={isOpen && !user && !isLogged}
+      onOpenChange={(state) =>
+        openLogin({ status: state })
+      }
     >
       <Dialog.Trigger />
       <Dialog.Portal>
@@ -90,10 +80,9 @@ export const LoginForm = () => {
               name="whatsapp"
               rules={{
                 required: "O número de telefone é obrigatório.",
-                validate: validatePhoneNumber(country),
+                validate: validatePhoneNumber,
               }}
               render={(props) => {
-                const placeholder = DDI.find((ddi) => ddi.ddi === country);
                 return (
                   <div>
                     <label
@@ -102,43 +91,13 @@ export const LoginForm = () => {
                     >
                       Whatsapp
                     </label>
-                    <div className="relative mt-2 rounded-md shadow-sm">
-                      <Controller
-                        control={control}
-                        name="country"
-                        render={(selectProps) => {
-                          return (
-                            <div className="absolute inset-y-0 left-0 flex items-center">
-                              <label htmlFor="country" className="sr-only">
-                                Country
-                              </label>
-                              <select
-                                id="country"
-                                autoComplete="country"
-                                className="h-full rounded-md border-0 bg-transparent py-0 pl-3 pr-7 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
-                                disabled={!user?.isAuthenticated && isLogged}
-                                {...selectProps.field}
-                              >
-                                {DDI.map(({ ddi, sigla }) => (
-                                  <option value={ddi} key={ddi}>
-                                    {sigla}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                          );
-                        }}
-                      />
-                      {/* <InputMask
-                        {...props.field}
-                        type="text"
-                        id={props.field.name}
-                        className="block w-full rounded-md border-0 py-1.5 pl-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                        placeholder={placeholder?.placeholder}
-                        disabled={!user?.isAuthenticated && isLogged}
-                        mask={placeholder!.mask!}
-                      /> */}
-                    </div>
+                    <PhoneInput
+                      {...props.field}
+                      type="text"
+                      id={props.field.name}
+                      className="w-full rounded-md border-0 py-1.5 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"
+                      defaultCountry="BR"
+                    />
                   </div>
                 );
               }}
@@ -162,7 +121,6 @@ export const LoginForm = () => {
               </button>
               <button
                 aria-label="Próximo: ir para a pagina de autenticação com PIN"
-
                 data-loading={isSubmitting}
                 type="submit"
                 className="bg-indigo-600 text-white hover:bg-indigo-400 focus:shadow-green7 inline-flex h-[35px] items-center justify-center rounded-[4px] px-[15px] font-medium leading-none focus:shadow-[0_0_0_2px] focus:outline-none data-[loading=true]:cursor-not-allowed disabled:opacity-30 disabled:cursor-not-allowed"
@@ -182,7 +140,7 @@ export const LoginForm = () => {
                 className="text-violet11 hover:bg-violet4 focus:shadow-violet7 absolute top-[10px] right-[10px] inline-flex h-[25px] w-[25px] appearance-none items-center justify-center rounded-full focus:shadow-[0_0_0_2px] focus:outline-none"
                 aria-label="Close"
               >
-                {/* <Cross2Icon /> */}
+                <X />
               </button>
             </Dialog.Close>
           </form>

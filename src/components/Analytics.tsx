@@ -4,6 +4,7 @@ import Script from "next/script";
 export const Analytics = () => (
   <>
     <Script
+      defer
       strategy="afterInteractive"
       src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
     />

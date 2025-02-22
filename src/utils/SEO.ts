@@ -17,15 +17,6 @@ export const SEO_MULTI_PAGE: PageSEO[] = [
     url: "fazer-figurinhas-whatsapp-online",
   },
   {
-    heading: "Figurinhas +18: Dê uma Pitada de Diversão Picante ao WhatsApp!",
-    heading_description:
-      "Quer apimentar suas conversas no WhatsApp? Nosso bot de figurinhas +18 faz isso em três passos simples: autenticar, selecionar a imagem e enviá-la para o WhatsApp. Diversão adulta nunca foi tão fácil!",
-    title: "Figurinhas WhatsApp +18 | Crie e Envie em Instantes",
-    description:
-      "Explore figurinhas picantes para WhatsApp com nosso bot. Autentique-se, escolha sua imagem e envie com facilidade. Baixe agora e divirta-se!",
-    url: "figurinhas-whatsapp-mais-18",
-  },
-  {
     heading: "Figurinhas WhatsApp Grátis: Personalize Suas Conversas!",
     heading_description:
       "Personalizar suas conversas no WhatsApp é simples! Use nossa aplicação para criar figurinhas grátis em três passos: autentique-se, escolha a imagem e envie para o WhatsApp. Experimente agora!",
@@ -51,5 +42,5 @@ export const SEO_MULTI_PAGE: PageSEO[] = [
     description:
       "Faça figurinhas engraçadas em minutos. Autentique-se, escolha a imagem e compartilhe no WhatsApp. Baixe a aplicação agora para espalhar alegria!",
     url: "figurinhas-whatsapp-divertidas",
-  }
+  },
 ];
