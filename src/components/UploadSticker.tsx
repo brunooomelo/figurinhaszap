@@ -10,11 +10,13 @@ import * as Dialog from "@radix-ui/react-dialog";
 import ImageCrop from "./ImageCrop";
 import { useCrop } from "@/hooks/useCrop";
 import { useReward } from "react-rewards";
+import { GifSearchModal } from "./GifSearch";
+import { toast } from "sonner";
 
 export const UploadSticker = () => {
   const { isLogged, openLogin, user } = useAuth();
   const [isCropUsed, setIsCropUsed] = useState(false)
-  const [accept, setAccept] = useState("image/png, image/webp, image/jpeg")
+  const [accept, setAccept] = useState("image/png, image/webp, image/jpeg, image/gif")
   const [sticker, setSticker] = useState<File | Blob | null>(null);
   const previewImagem = useMemo(
     () => (sticker ? URL.createObjectURL(sticker) : null),
@@ -48,8 +50,10 @@ export const UploadSticker = () => {
     const FIRST_ITEM = 0;
 
     const selectedFile = files.item(FIRST_ITEM);
-    //TODO: add toast
-    if (!selectedFile) return;
+    if (!selectedFile) {
+      toast.error('Não foi possivel selecionar a imagem')
+      return
+    };
     const maxAllowedSize = 25 * 1024 * 1024;
     setSticker(selectedFile?.size > maxAllowedSize ? null : selectedFile);
   }
@@ -58,8 +62,7 @@ export const UploadSticker = () => {
     try {
       const body = new FormData();
       if (!sticker) {
-        // TODO: add toast
-        alert("Deu erro ao editar sua imagem.");
+        toast.error('Deu erro ao editar sua imagem.')
         return;
       }
       body.append("file", sticker);
@@ -75,15 +78,14 @@ export const UploadSticker = () => {
         credentials: 'include'
       }).then((res) => res.json());
       if (response.error) {
-        //TODO: add toast
-        alert(response.error);
+        toast.error(response.error)
         return;
       }
       reward()
 
-      alert(response.message);
+      toast.success(response.message);
     } catch (error) {
-      // TODO: add toast
+      toast.error('Erro desconhecido.')
       console.log(error);
     } finally {
       setSticker(null);
@@ -95,7 +97,7 @@ export const UploadSticker = () => {
   const onSubmit = useCallback(async () => {
     try {
       if (!isLogged) {
-        //TODO: toast
+        toast.error('voce nao esta logado')
         return;
       }
       await generateFormData();
@@ -123,8 +125,8 @@ export const UploadSticker = () => {
 
 
   useEffect(() => {
-    if (user?.isPremium) {
-      setAccept('image/gif')
+    if (!user?.isPremium) {
+      setAccept(prev => prev.concat(', image/gif'))
     }
   }, [user])
 
@@ -185,7 +187,7 @@ export const UploadSticker = () => {
                 <p className="pl-1"> e veja a mágicas acontecer. 🪄</p>
               </div>
               <p className="text-xs leading-5 text-gray-600">
-                PNG, JPG, {user?.isPremium && 'GIF,'} WEBP até 25MB
+                PNG, JPG, {!user?.isPremium && 'GIF,'} WEBP até 25MB
               </p>
             </div>
           </label >
@@ -217,6 +219,7 @@ export const UploadSticker = () => {
           >
             {isSubmitting ? "Gerando e enviando ..." : "Gerar figurinha 🪄"}
           </button>
+          {/* <GifSearchModal onSend={() => { }} open={!true} onOpenChange={() => { }} /> */}
         </div>
       </div >
     </div >

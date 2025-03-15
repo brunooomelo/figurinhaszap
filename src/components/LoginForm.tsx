@@ -11,8 +11,6 @@ import {
 import { event } from "@/utils/gtag";
 import { X } from "lucide-react";
 import { PhoneInput } from "./ui/phoneNumber";
-import { useMutation } from '@tanstack/react-query'
-import { environment } from "@/utils/environment";
 
 const validatePhoneNumber = (value: string) => {
   const phoneNumber = parsePhoneNumberFromString(value);

@@ -11,6 +11,7 @@ import {
 } from "react";
 import { PinForm } from "./PinForm";
 import { LoginForm } from "./LoginForm";
+import { toast } from "sonner";
 
 export type User = {
   id: string;
@@ -53,8 +54,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }).then((res) => res.json());
 
     if (session.error) {
-      //TODO: adicionar toast error
-      alert(session.error);
+      toast.error(session.error)
       return;
     }
     setUser({
@@ -95,8 +95,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }).then((res) => res.json());
 
       if (response.error) {
-        //TODO: adicionar toast error
-        alert(response.error);
+        toast.error(response.error)
         return;
       }
 
@@ -107,14 +106,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
     } catch (error) {
       console.log(error);
-      alert("Ocorreu um erro, tente mais tarde");
+      toast.error("Ocorreu um erro, tente mais tarde")
     }
   };
 
   const setPin = async (token: string) => {
     try {
       if (!user?.id || !token) {
-        // TODO: error toast
+        toast.error("Não foi encontrado uma autenticação.")
         return;
       }
       const response = await fetch(`${environment.APIURL}/authenticate`, {
@@ -129,15 +128,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         },
       }).then((res) => res.json());
       if (response.error) {
-        alert(response.error);
+        toast.error(response.error)
         return;
       }
-
-      alert(response.message);
+      toast.success(response.message)
       setIsLogged(true)
     } catch (error) {
       console.log(error);
-      alert("Ocorreu um erro, tente mais tarde");
+      toast.error("Ocorreu um erro, tente mais tarde");
     }
   };
 

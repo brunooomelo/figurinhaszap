@@ -37,7 +37,7 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return <HomePage
-    heading={<>Crie Figurinhas para WhatsApp em Segundos – <span className="text-green-500">Sem Instalar Nada!</span></>}
+    heading={<>Crie Figurinhas para WhatsApp em Segundos – <span className="text-indigo-500">Sem Instalar Nada!</span></>}
     subheading="Envie uma imagem e receba a figurinha direto no seu WhatsApp. Rápido, fácil e gratuito para começar!"
   />
 }

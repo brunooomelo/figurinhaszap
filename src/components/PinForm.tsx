@@ -1,6 +1,8 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { Controller, useForm } from "react-hook-form";
 import { useAuth } from "./AuthContext";
+import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "./ui/input-otp";
+import { REGEXP_ONLY_DIGITS } from "input-otp";
 
 export const PinForm = () => {
   const { isLogged, openLogin, user, setPin, isOpen, changeNumber } = useAuth();
@@ -60,11 +62,19 @@ export const PinForm = () => {
                   >
                     PIN
                   </label>
-                  <input
-                    className="text-violet11 shadow-violet7 focus:shadow-violet8 inline-flex h-[35px] w-full flex-1 items-center justify-center rounded-[4px] px-[10px] text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
-                    id="pin"
+                  <InputOTP maxLength={6}
+                    pattern={REGEXP_ONLY_DIGITS}
                     {...props.field}
-                  />
+                  >
+                    <InputOTPGroup>
+                      <InputOTPSlot index={0} />
+                      <InputOTPSlot index={1} />
+                      <InputOTPSlot index={2} />
+                      <InputOTPSlot index={3} />
+                      <InputOTPSlot index={4} />
+                      <InputOTPSlot index={5} />
+                    </InputOTPGroup>
+                  </InputOTP>
                 </fieldset>
               )}
             />

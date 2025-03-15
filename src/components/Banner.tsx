@@ -1,5 +1,5 @@
 export const Banner = () => (
-  <div className="flex items-center justify-center gap-x-6 bg-green-600 px-6 py-2.5 sm:px-3.5 ">
+  <div className="flex items-center justify-center gap-x-6 bg-indigo-600 px-6 py-2.5 sm:px-3.5 ">
     <p className="text-sm leading-6 text-white">
       <span>
         <strong className="font-semibold">Versão BETA</strong>

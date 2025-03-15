@@ -4,6 +4,8 @@ import { Analytics } from "../components/Analytics"
 import { AuthProvider } from "../components/AuthContext"
 import { Banner } from "../components/Banner"
 import { Inter } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
+
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -40,6 +42,12 @@ export default function RootLayout({
           >
             <Banner />
             {children}
+            <Toaster
+              richColors
+              position="top-center"
+              theme="light"
+              closeButton
+            />
           </div>
         </AuthProvider>
         <Analytics />

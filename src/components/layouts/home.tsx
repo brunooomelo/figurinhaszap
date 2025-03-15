@@ -55,16 +55,6 @@ export const HomePage = ({ heading, subheading }: HomePage) => {
       </section>
       <Faq />
 
-      {/* <section className="py-12 md:py-20 bg-green-500 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">Comece agora e crie sua primeira figurinha grátis!</h2>
-          <Button size="lg" className="bg-white text-green-500 hover:bg-gray-100">
-            Começar a Criar
-            <ChevronRight className="ml-2 h-4 w-4" />
-          </Button>
-          <p className="text-sm">Faça upgrade para Plus e desbloqueie figurinhas ilimitadas e GIFs!</p>
-        </div>
-      </section> */}
 
       <footer className="bg-[#0D1117] text-gray-400 py-16">
         <div className="container mx-auto px-4">
