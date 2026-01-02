@@ -1,156 +1,107 @@
-import { environment } from "@/utils/environment";
-import { setCookie, parseCookies, destroyCookie } from "nookies";
-import {
-  ReactNode,
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+'use client';
 
-type User = {
-  id: string;
-  whatsapp: string;
-  isAuthenticated: boolean;
-};
+import { ReactNode, createContext, useCallback, useContext, useState } from 'react';
+import { useSession, useLogin, useLogout, useValidatePin, User } from '@/hooks/useAuthQuery';
+import { toast } from 'sonner';
+
 type IOpenLogin = {
   status?: boolean;
   reset?: boolean;
 };
+
 type IContext = {
   user: User | null;
   isLogged: boolean;
   isOpen: boolean;
-  openLogin: (data?: IOpenLogin) => Promise<void>;
-  changeNumber: () => Promise<void>;
-  logout: () => Promise<void>;
-  setPin: (token: string) => Promise<void>;
-  login: ({ whatsapp }: { whatsapp: string }) => Promise<void>;
+  isLoading: boolean;
+  openLogin: (data?: IOpenLogin) => void;
+  changeNumber: () => void;
+  logout: () => void;
+  setPin: (token: string) => void;
+  login: ({ whatsapp }: { whatsapp: string }) => void;
 };
 
 const Context = createContext({ user: null } as IContext);
 export const useAuth = () => useContext(Context);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLogged, setIsLogged] = useState(false);
   const [isOpen, setOpen] = useState(false);
 
-  const getSession = useCallback(async () => {
-    const cookies = parseCookies();
-    const token = cookies.phone_token;
+  const { data: user, isLoading: isSessionLoading } = useSession();
+  const loginMutation = useLogin();
+  const logoutMutation = useLogout();
+  const validatePinMutation = useValidatePin();
 
-    if (!token) return;
-    const session = await fetch(`${environment.APIURL}/session`, {
-      headers: {
-        "x-auth-token": token,
-      },
-    }).then((res) => res.json());
-
-    if (session.error) {
-      alert(session.error);
-      return;
-    }
-    setUser(session.data);
-    setIsLogged(true);
-  }, []);
-
-  const logout = useCallback(async () => {
-    destroyCookie(null, 'phone_token')
-    setIsLogged(false);
-    setUser(null);
-  }, []);
+  const isLogged = !!user?.isAuthenticated;
+  const isLoading = isSessionLoading || loginMutation.isPending || logoutMutation.isPending || validatePinMutation.isPending;
 
   const openLogin = useCallback(
-    async ({ status = true, reset = false } = {} as IOpenLogin) => {
+    ({ status = true, reset = false } = {} as IOpenLogin) => {
       if (reset) {
-        setUser(null);
-        setIsLogged(false);
+        logoutMutation.mutate();
       }
       setOpen(status);
     },
-    []
+    [logoutMutation]
   );
 
-  const login = async ({ whatsapp }: { whatsapp: string }) => {
-    try {
-      const response = await fetch(`${environment.APIURL}/login`, {
-        method: "POST",
-        body: JSON.stringify({
-          whatsapp,
-        }),
-        headers: {
-          "Content-Type": "application/json",
+  const login = useCallback(
+    ({ whatsapp }: { whatsapp: string }) => {
+      loginMutation.mutate(whatsapp, {
+        onSuccess: () => {
+          setOpen(false);
         },
-      }).then((res) => res.json());
-
-      if (response.error) {
-        // adicionar toast error
-        alert(response.error);
-        return;
-      }
-
-      setUser({
-        id: response.id,
-        isAuthenticated: response.isAuthenticated,
-        whatsapp: response.whatsapp,
+        onError: (error) => {
+          toast.error(error.message || 'Ocorreu um erro ao fazer login');
+        },
       });
-      setIsLogged(true);
-    } catch (error) {
-      console.log(error);
-      alert("Ocorreu um erro, tente mais tarde");
-    }
-  };
+    },
+    [loginMutation]
+  );
 
-  const setPin = async (token: string) => {
-    try {
+  const setPin = useCallback(
+    (token: string) => {
       if (!user?.id || !token) {
-        // TODO: error
-        return;
-      }
-      const response = await fetch(`${environment.APIURL}/phone/validade`, {
-        method: "POST",
-        body: JSON.stringify({
-          id: user.id,
-          token,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }).then((res) => res.json());
-      if (response.error) {
-        alert(response.error);
+        toast.error('Usuário ou token inválido');
         return;
       }
 
-      alert(response.message);
-      const { id, isAuthenticated, whatsapp } = response.data;
-      setUser({ id, isAuthenticated, whatsapp });
+      validatePinMutation.mutate(
+        { userId: user.id, token },
+        {
+          onSuccess: ({ message }) => {
+            toast.success(message);
+            setOpen(false);
+          },
+          onError: (error) => {
+            toast.error(error.message || 'Ocorreu um erro ao validar o PIN');
+          },
+        }
+      );
+    },
+    [user?.id, validatePinMutation]
+  );
 
-      setCookie(null, "phone_token", response.token, {
-        maxAge: 86400 * 7,
-        path: "/",
-      });
-    } catch (error) {
-      console.log(error);
-      alert("Ocorreu um erro, tente mais tarde");
-    }
-  };
+  const logout = useCallback(() => {
+    logoutMutation.mutate(undefined, {
+      onSuccess: () => {
+        toast.success('Logout realizado com sucesso');
+      },
+      onError: (error) => {
+        toast.error(error.message || 'Ocorreu um erro ao fazer logout');
+      },
+    });
+  }, [logoutMutation]);
 
-  const changeNumber = async () => {
-    setUser(null);
-    setIsLogged(false);
-  };
-
-  useEffect(() => {
-    getSession();
-  }, [getSession]);
+  const changeNumber = useCallback(() => {
+    logoutMutation.mutate();
+    setOpen(true);
+  }, [logoutMutation]);
 
   return (
     <Context.Provider
       value={{
-        user,
+        user: user || null,
         logout,
         isLogged,
         openLogin,
@@ -158,6 +109,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         login,
         setPin,
         changeNumber,
+        isLoading,
       }}
     >
       {children}
