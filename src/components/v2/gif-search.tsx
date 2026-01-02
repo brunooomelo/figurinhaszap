@@ -170,7 +170,7 @@ export function GifSearch({ onGifSelect, apiProvider }: GifSearchProps) {
     searchGifs(true);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       handleSearch();
     }
@@ -194,7 +194,7 @@ export function GifSearch({ onGifSelect, apiProvider }: GifSearchProps) {
             placeholder={`Buscar GIFs no ${apiProvider === "giphy" ? "Giphy" : "Tenor"}...`}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyDown}
             className="pl-10 h-11 rounded-xl border-2 focus:border-primary transition-colors"
           />
         </div>
@@ -208,7 +208,11 @@ export function GifSearch({ onGifSelect, apiProvider }: GifSearchProps) {
         </Button>
       </div>
 
-      <div className="max-h-[300px] overflow-y-auto rounded-xl p-2 bg-muted/30">
+      <div
+        ref={containerRef}
+        onScroll={handleScroll}
+        className="max-h-[300px] overflow-y-auto rounded-xl p-2 bg-muted/30"
+      >
         {isApiConfigured ? (
           <div className="grid grid-cols-3 gap-2">
             {results.map((gif) => (
@@ -241,6 +245,12 @@ export function GifSearch({ onGifSelect, apiProvider }: GifSearchProps) {
             {isLoading && (
               <div className="col-span-3 text-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin mx-auto text-muted-foreground" />
+              </div>
+            )}
+            {isLoadingMore && (
+              <div className="col-span-3 text-center py-4">
+                <Loader2 className="h-5 w-5 animate-spin mx-auto text-muted-foreground" />
+                <span className="text-xs text-muted-foreground mt-1 block">Carregando mais...</span>
               </div>
             )}
           </div>
