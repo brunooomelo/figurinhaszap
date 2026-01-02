@@ -2,7 +2,7 @@ import { SideAds } from "@/components/ads/SideAds";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {  Sparkles, Search, Share2, Download } from "lucide-react";
+import { Sparkles, Search, Share2, Download } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -108,7 +108,7 @@ export default function PublicStickers() {
       {filteredStickers.length === 0 && (
         <div className="text-center py-16">
           <p className="text-muted-foreground text-lg">
-            Nenhuma figurinha encontrada para "{searchQuery}"
+            Nenhuma figurinha encontrada para &quot;{searchQuery}&quot;
           </p>
         </div>
       )}
